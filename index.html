@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Class XII Tracker - Fast & Touch Friendly</title>
+    <title>Class XII Tracker - Sync & Fast</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -23,12 +23,15 @@
                 </h1>
             </div>
             
-            <div class="flex items-center gap-2">
-                <button onclick="addNewSubjectPrompt()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 rounded-lg transition flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Add Subject</span>
+            <div class="flex items-center gap-1.5">
+                <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition flex items-center gap-1" title="Export Progress">
+                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Export</span>
                 </button>
-                <button onclick="resetData()" class="px-3 py-1.5 text-xs font-semibold text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1" title="Reset Syllabus">
-                    <i class="fa-solid fa-rotate-right"></i> Reset
+                <button onclick="importData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/20 transition flex items-center gap-1" title="Import Progress">
+                    <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Import</span>
+                </button>
+                <button onclick="resetData()" class="p-1.5 text-xs font-semibold text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition" title="Reset Syllabus">
+                    <i class="fa-solid fa-rotate-right"></i>
                 </button>
             </div>
         </div>
@@ -227,8 +230,35 @@
             renderUI();
         }
 
+        function exportData() {
+            const dataStr = btoa(JSON.stringify(syllabus));
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert("Aapka progress code copy ho gaya hai! Is code ko mobile par Import button me paste kar dein.");
+            }).catch(() => {
+                prompt("Aapka progress code yahan hai, isse copy karein:", dataStr);
+            });
+        }
+
+        function importData() {
+            const inputData = prompt("PC se copy kiya hua code yahan paste karein:");
+            if (inputData && inputData.trim() !== "") {
+                try {
+                    const parsed = JSON.parse(atob(inputData.trim()));
+                    if (Array.isArray(parsed)) {
+                        syllabus = parsed;
+                        saveAndRender();
+                        alert("Progress successfuly sync ho gaya!");
+                    } else {
+                        alert("Invalid code format!");
+                    }
+                } catch(e) {
+                    alert("Code sahi nahi hai. Phir se copy karein.");
+                }
+            }
+        }
+
         function resetData() {
-            if (confirm("Kya aap saara progress reset karke naya accurate syllabus load karna chahte hain?")) {
+            if (confirm("Kya aap saara progress reset karna chahte hain?")) {
                 localStorage.removeItem('class12_touch_v1');
                 syllabus = defaultSyllabus;
                 activeSubIdx = 0;
@@ -289,7 +319,6 @@
         }
 
         function renderUI() {
-            // Render Stats
             const m = calculateMetrics();
             document.getElementById('stat-overall').innerText = `${m.overallPct}%`;
             document.getElementById('progress-bar').style.width = `${m.overallPct}%`;
@@ -298,7 +327,6 @@
             document.getElementById('stat-rev').innerText = `${m.totalF}`;
             document.getElementById('stat-total').innerText = `${m.totalItems}`;
 
-            // Render Tabs
             const tabsContainer = document.getElementById('subject-tabs');
             tabsContainer.innerHTML = '';
             syllabus.forEach((sub, idx) => {
@@ -314,14 +342,12 @@
                 tabsContainer.appendChild(btn);
             });
 
-            // Render Active Subject Syllabus List
             const container = document.getElementById('active-subject-container');
             container.innerHTML = '';
 
             const activeSub = syllabus[activeSubIdx];
             if (!activeSub) return;
 
-            // Header Control
             const topBar = document.createElement('div');
             topBar.className = 'flex items-center justify-between bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs';
             topBar.innerHTML = `
@@ -334,7 +360,6 @@
             `;
             container.appendChild(topBar);
 
-            // List Items
             activeSub.items.forEach((it, itemIdx) => {
                 const row = document.createElement('div');
                 
@@ -353,7 +378,6 @@
                             ${it.title}
                         </span>
                         
-                        <!-- LARGER EASY-TO-TAP BUTTONS -->
                         <div class="flex items-center gap-2 shrink-0">
                             <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'n')" 
                                 class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
