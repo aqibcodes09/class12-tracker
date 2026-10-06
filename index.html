@@ -3,31 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Class XII Tracker - Minimal & Fast</title>
+    <title>Class XII Tracker - Fast & Touch Friendly</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: { cyan: '#06b6d4', purple: '#8b5cf6', emerald: '#10b981', amber: '#f59e0b', rose: '#f43f5e' }
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased pb-12 select-none">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased pb-16 select-none">
 
     <!-- Compact Navbar -->
-    <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
                 <div class="w-8 h-8 bg-gradient-to-tr from-cyan-500 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
                     <i class="fa-solid fa-check text-sm font-bold"></i>
@@ -38,57 +24,57 @@
             </div>
             
             <div class="flex items-center gap-2">
-                <button onclick="addNewSubjectPrompt()" class="p-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 rounded-lg transition flex items-center gap-1.5">
+                <button onclick="addNewSubjectPrompt()" class="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 rounded-lg transition flex items-center gap-1">
                     <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Add Subject</span>
                 </button>
-                <button onclick="resetData()" class="p-2 text-xs font-semibold text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1.5" title="Reset Syllabus">
-                    <i class="fa-solid fa-rotate-right"></i>
+                <button onclick="resetData()" class="px-3 py-1.5 text-xs font-semibold text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1" title="Reset Syllabus">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-3 sm:px-6 py-4 space-y-4">
+    <main class="max-w-4xl mx-auto px-3 sm:px-6 py-4 space-y-4">
 
-        <!-- MINIMAL DASHBOARD OVERVIEW -->
-        <section class="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-4 shadow-xl">
-            <div class="flex items-center justify-between mb-3">
+        <!-- DASHBOARD OVERVIEW -->
+        <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
+            <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-chart-pie text-cyan-400 text-sm"></i>
-                    <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Quick Stats</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Overall Progress</span>
                 </div>
-                <div id="stat-overall" class="text-lg font-black text-cyan-400">0%</div>
+                <div id="stat-overall" class="text-xl font-black text-cyan-400">0%</div>
             </div>
 
             <!-- Stats Bar -->
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-3">
                 <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
             </div>
 
-            <!-- Compact Counter Grid -->
+            <!-- Counter Grid -->
             <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/60">
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
                     <span class="block text-[10px] text-slate-400 font-bold uppercase">Notes</span>
-                    <span id="stat-notes" class="font-black text-emerald-400 mt-0.5 block">0</span>
+                    <span id="stat-notes" class="font-black text-emerald-400 text-sm block">0</span>
                 </div>
-                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/60">
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
                     <span class="block text-[10px] text-slate-400 font-bold uppercase">MCQs</span>
-                    <span id="stat-mcqs" class="font-black text-amber-400 mt-0.5 block">0</span>
+                    <span id="stat-mcqs" class="font-black text-amber-400 text-sm block">0</span>
                 </div>
-                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/60">
-                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Rev</span>
-                    <span id="stat-rev" class="font-black text-indigo-400 mt-0.5 block">0</span>
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Revision</span>
+                    <span id="stat-rev" class="font-black text-indigo-400 text-sm block">0</span>
                 </div>
-                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/60">
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
                     <span class="block text-[10px] text-slate-400 font-bold uppercase">Total</span>
-                    <span id="stat-total" class="font-black text-purple-400 mt-0.5 block">0</span>
+                    <span id="stat-total" class="font-black text-purple-400 text-sm block">0</span>
                 </div>
             </div>
         </section>
 
-        <!-- SUBJECT TABS (MOBILE FRIENDLY) -->
-        <div id="subject-tabs" class="flex gap-2 overflow-x-auto pb-2 scrollbar-none text-xs font-semibold">
-            <!-- Tabs injected dynamically -->
+        <!-- SUBJECT TABS -->
+        <div id="subject-tabs" class="flex gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+            <!-- Dynamic Tabs -->
         </div>
 
         <!-- ACTIVE SYLLABUS LIST -->
@@ -99,9 +85,9 @@
     </main>
 
     <script>
-        function createPhysicsChapter(chNum, name) {
+        function createPhysicsChapter(chNum) {
             return [
-                { title: `Ch ${chNum}: ${name}`, isHeader: true, n: false, m: false, f: false },
+                { title: `Chapter ${chNum}`, isHeader: true, n: false, m: false, f: false },
                 { title: 'Short Questions', isSub: true, n: false, m: false, f: false },
                 { title: 'Long Questions', isSub: true, n: false, m: false, f: false },
                 { title: 'Derivations', isSub: true, n: false, m: false, f: false },
@@ -119,8 +105,8 @@
             ];
         }
 
-        function createMathUnit(unitName, exercises) {
-            let list = [{ title: unitName, isHeader: true, n: false, m: false, f: false }];
+        function createMathUnit(unitTitle, exercises) {
+            let list = [{ title: unitTitle, isHeader: true, n: false, m: false, f: false }];
             exercises.forEach(ex => {
                 list.push({ title: ex, isSub: true, n: false, m: false, f: false });
             });
@@ -139,55 +125,111 @@
 
         const defaultSyllabus = [
             { id: 'sub_physics', name: 'PHYSICS', items: [
-                ...createPhysicsChapter(15, 'Electrostatics'),
-                ...createPhysicsChapter(16, 'Current Electricity'),
-                ...createPhysicsChapter(17, 'Electromagnetism'),
-                ...createPhysicsChapter(18, 'Electromagnetic Induction'),
-                ...createPhysicsChapter(19, 'Alternating Current'),
-                ...createPhysicsChapter(20, 'Physics of Solids'),
-                ...createPhysicsChapter(21, 'Nuclear Physics')
+                ...createPhysicsChapter(15), ...createPhysicsChapter(16), ...createPhysicsChapter(17),
+                ...createPhysicsChapter(18), ...createPhysicsChapter(19), ...createPhysicsChapter(20),
+                ...createPhysicsChapter(21), ...createPhysicsChapter(22), ...createPhysicsChapter(23),
+                ...createPhysicsChapter(24), ...createPhysicsChapter(25), ...createPhysicsChapter(26),
+                ...createPhysicsChapter(27), ...createPhysicsChapter(28)
             ]},
             { id: 'sub_chemistry', name: 'CHEMISTRY', items: [
                 ...createChemChapter(1), ...createChemChapter(2), ...createChemChapter(3),
                 ...createChemChapter(4), ...createChemChapter(5), ...createChemChapter(6),
                 ...createChemChapter(7), ...createChemChapter(8), ...createChemChapter(9),
-                ...createChemChapter(10), ...createChemChapter(11), ...createChemChapter(12), ...createChemChapter(13)
+                ...createChemChapter(10), ...createChemChapter(11), ...createChemChapter(12),
+                ...createChemChapter(13)
             ]},
-            { id: 'sub_maths', name: 'MATHS', items: [
-                ...createMathUnit('Unit 1: Functions & Limits', ['Ex 1.1 - 1.5']),
-                ...createMathUnit('Unit 2: Differentiation', ['Ex 2.1 - 2.4', 'Review Ex 2']),
-                ...createMathUnit('Unit 3: Integration', ['Ex 3.1 - 3.6', 'Review Ex 3']),
-                ...createMathUnit('Unit 4: Analytic Geometry', ['Ex 4.1 - 4.4', 'Review Ex 4']),
-                ...createMathUnit('Unit 5: Linear Inequalities', ['Ex 5.1 - 5.2']),
-                ...createMathUnit('Unit 6: Conic Sections', ['Ex 6.1 - 6.7']),
-                ...createMathUnit('Unit 7: Vectors', ['Ex 7.1 - 7.8'])
+            { id: 'sub_maths', name: 'MATHEMATICS', items: [
+                ...createMathUnit('Unit # 1', []),
+                ...createMathUnit('Unit # 2', ['Ex 2.1', 'Ex 2.2', 'Ex 2.3', 'Ex 2.4', 'Review Ex']),
+                ...createMathUnit('Unit # 3', ['Ex 3.1', 'Ex 3.2', 'Ex 3.3', 'Ex 3.4', 'Ex 3.5', 'Ex 3.6', 'Review Ex']),
+                ...createMathUnit('Unit # 4', ['Ex 4.1', 'Ex 4.2', 'Ex 4.3', 'Ex 4.4', 'Review Ex']),
+                ...createMathUnit('Unit # 5', ['Ex 5.1', 'Ex 5.2', 'Review Ex']),
+                ...createMathUnit('Unit # 6', ['Ex 6.1', 'Ex 6.2', 'Ex 6.3', 'Ex 6.4', 'Ex 6.5', 'Ex 6.6', 'Ex 6.7', 'Review Ex']),
+                ...createMathUnit('Unit # 7', ['Ex 7.1', 'Ex 7.2', 'Ex 7.3', 'Ex 7.4', 'Ex 7.5', 'Ex 7.6', 'Ex 7.7', 'Ex 7.8', 'Review Ex']),
+                ...createMathUnit('Unit # 8', ['Ex 8.1', 'Ex 8.2', 'Ex 8.3', 'Ex 8.4', 'Review Ex']),
+                ...createMathUnit('Unit # 9', ['Ex 9.1', 'Ex 9.2', 'Ex 9.3', 'Ex 9.4', 'Ex 9.5', 'Ex 9.6', 'Review Ex']),
+                ...createMathUnit('Unit # 10', ['Ex 10.1', 'Ex 10.2', 'Ex 10.3', 'Review Ex']),
+                ...createMathUnit('Unit # 11', []),
+                ...createMathUnit('Unit # 12', ['Ex 12.1', 'Ex 12.2', 'Ex 12.3', 'Ex 12.4', 'Review Ex'])
             ]},
             { id: 'sub_english', name: 'ENGLISH', items: [
-                ...createGenChapter('Prose: Devoted Friend'), ...createGenChapter('Prose: I Have a Dream'),
-                ...createGenChapter('Prose: Stress & Anger'), ...createGenChapter('Poetry: If'),
-                ...createGenChapter('Poetry: 7 Ages of Man'), ...createGenChapter('Novel: Great Expectations')
+                ...createGenChapter('Prose: 1.1 Devoted Friend'),
+                ...createGenChapter('Prose: 2.1 I Have a Dream'),
+                ...createGenChapter('Prose: 3.1 Stress/Anger'),
+                ...createGenChapter('Prose: 4.1 Self-Discipline'),
+                ...createGenChapter('Prose: 5.1 Character Build'),
+                ...createGenChapter('Prose: 6.1 Civic Respons.'),
+                ...createGenChapter('Prose: 7.1 Climate Change'),
+                ...createGenChapter('Poetry: 01. If'),
+                ...createGenChapter('Poetry: 02. Age of Infancy'),
+                ...createGenChapter('Poetry: 03. 7 Ages of Man'),
+                ...createGenChapter('Poetry: 04. Dying Slowly'),
+                ...createGenChapter('Poetry: 05. Ulysses'),
+                ...createGenChapter('Poetry: 06. Stop Clocks'),
+                ...createGenChapter('Poetry: 07. Sur Sasui'),
+                ...createGenChapter('Novel: Great Expectations')
             ]},
             { id: 'sub_pakstudies', name: 'PAK STUDIES', items: [
                 ...createGenChapter('Chapter 1'), ...createGenChapter('Chapter 2'), ...createGenChapter('Chapter 3'),
-                ...createGenChapter('Chapter 4'), ...createGenChapter('Chapter 5'), ...createGenChapter('Chapter 6')
+                ...createGenChapter('Chapter 4'), ...createGenChapter('Chapter 5'), ...createGenChapter('Chapter 6'),
+                ...createGenChapter('Chapter 7'), ...createGenChapter('Chapter 8'), ...createGenChapter('Chapter 9'),
+                ...createGenChapter('Chapter 10')
             ]},
             { id: 'sub_urdu', name: 'URDU', items: [
-                ...createGenChapter('Nasr: Seerat-e-Muhammadi'), ...createGenChapter('Nasr: Qaht-er-Rijal'),
-                ...createGenChapter('Nazm: Hamd & Naat'), ...createGenChapter('Ghazaliat: Ghalib & Mir')
+                ...createGenChapter('Nasr: 1. Seerat-e-Muhammadi'),
+                ...createGenChapter('Nasr: 2. Aalamgir Kifayat'),
+                ...createGenChapter('Nasr: 3. Khush Tabi'),
+                ...createGenChapter('Nasr: 4. Qaht-er-Rijal'),
+                ...createGenChapter('Nasr: 5. Musha\'irah'),
+                ...createGenChapter('Nasr: 6. Adab Aamozon'),
+                ...createGenChapter('Nasr: 7. Lahore Mein Adeebon ki Colony'),
+                ...createGenChapter('Nasr: 8. Meradim'),
+                ...createGenChapter('Nasr: 9. Sahar Hone Tak'),
+                ...createGenChapter('Nasr: 10. Zameen'),
+                ...createGenChapter('Nasr: 11. Naye Daur Ki Larai'),
+                ...createGenChapter('Nasr: 12. Char Maal Dar'),
+                ...createGenChapter('Nasr: 13. Hasrat Mohani'),
+                ...createGenChapter('Nasr: 14. Sir Iqbal Marhoom'),
+                ...createGenChapter('Nasr: 15. Chutne Ke Ta Qayamat'),
+                ...createGenChapter('Nasr: 16. Sowere Jo Kal Aankh Meri Khuli'),
+                ...createGenChapter('Nasr: 17. Cricket'),
+                ...createGenChapter('Nazm: 1. Hamd'),
+                ...createGenChapter('Nazm: 2. Naat'),
+                ...createGenChapter('Nazm: 3. Manqabat'),
+                ...createGenChapter('Nazm: 4. Hazrat Fatima Zahra ki Rukshti'),
+                ...createGenChapter('Nazm: 5. Chand Aur Tare'),
+                ...createGenChapter('Nazm: 6. Badli Ka Chand'),
+                ...createGenChapter('Nazm: 7. Katba Kaun Likhe Ga'),
+                ...createGenChapter('Nazm: 8. Marham'),
+                ...createGenChapter('Nazm: 9. Do Bahre Shanasaiyon...'),
+                ...createGenChapter('Nazm: 10. Geet'),
+                ...createGenChapter('Nazm: 11. Asloob'),
+                ...createGenChapter('Nazm: 12. Aab-e-Zamzam'),
+                ...createGenChapter('Nazm: 13. Kaam'),
+                ...createGenChapter('Ghazal: 14. Khawaja Mir Dard'),
+                ...createGenChapter('Ghazal: 15. Mir Taqi Mir'),
+                ...createGenChapter('Ghazal: 16. Mirza Ghalib'),
+                ...createGenChapter('Ghazal: 17. Momin Khan Momin'),
+                ...createGenChapter('Ghazal: 18. Firaq Gorakhpuri'),
+                ...createGenChapter('Ghazal: 19. Jigar Moradabadi'),
+                ...createGenChapter('Ghazal: 20. Nasir Kazmi'),
+                ...createGenChapter('Ghazal: 21. Jaun Elia'),
+                ...createGenChapter('Ghazal: 22. Fatima Hasan'),
+                ...createGenChapter('Ghazal: 23. Khushal Khan')
             ]}
         ];
 
-        let syllabus = JSON.parse(localStorage.getItem('class12_minimal_v1')) || defaultSyllabus;
+        let syllabus = JSON.parse(localStorage.getItem('class12_touch_v1')) || defaultSyllabus;
         let activeSubIdx = 0;
 
         function saveAndRender() {
-            localStorage.setItem('class12_minimal_v1', JSON.stringify(syllabus));
+            localStorage.setItem('class12_touch_v1', JSON.stringify(syllabus));
             renderUI();
         }
 
         function resetData() {
-            if (confirm("Kya aap saara progress reset karke naya minimal syllabus reload karna chahte hain?")) {
-                localStorage.removeItem('class12_minimal_v1');
+            if (confirm("Kya aap saara progress reset karke naya accurate syllabus load karna chahte hain?")) {
+                localStorage.removeItem('class12_touch_v1');
                 syllabus = defaultSyllabus;
                 activeSubIdx = 0;
                 saveAndRender();
@@ -209,7 +251,7 @@
         }
 
         function addItem(subIdx) {
-            const title = prompt("Enter New Item / Chapter:");
+            const title = prompt("Enter New Sub-Section / Chapter:");
             if (title && title.trim() !== "") {
                 syllabus[subIdx].items.push({ title: title.trim(), isSub: true, n: false, m: false, f: false });
                 saveAndRender();
@@ -262,7 +304,7 @@
             syllabus.forEach((sub, idx) => {
                 const isActive = idx === activeSubIdx;
                 const btn = document.createElement('button');
-                btn.className = `px-3.5 py-1.5 rounded-xl transition whitespace-nowrap border ${
+                btn.className = `px-4 py-2 rounded-xl transition whitespace-nowrap border text-xs ${
                     isActive 
                     ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-300 font-bold shadow-md shadow-cyan-500/10' 
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
@@ -281,53 +323,54 @@
 
             // Header Control
             const topBar = document.createElement('div');
-            topBar.className = 'flex items-center justify-between bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-xl text-xs';
+            topBar.className = 'flex items-center justify-between bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs';
             topBar.innerHTML = `
                 <span class="font-bold text-cyan-400 flex items-center gap-1.5">
                     <i class="fa-solid fa-book-bookmark"></i> ${activeSub.name}
                 </span>
-                <button onclick="addItem(${activeSubIdx})" class="text-[11px] font-semibold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 px-2.5 py-1 rounded-lg transition">
+                <button onclick="addItem(${activeSubIdx})" class="text-xs font-semibold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg transition">
                     + Add Item
                 </button>
             `;
             container.appendChild(topBar);
 
-            // List
+            // List Items
             activeSub.items.forEach((it, itemIdx) => {
                 const row = document.createElement('div');
                 
                 if (it.isHeader) {
-                    row.className = 'mt-3 mb-1 px-3 py-1.5 bg-slate-900/90 border-l-4 border-cyan-400 rounded-r-xl text-xs font-bold text-cyan-300 flex items-center justify-between';
+                    row.className = 'mt-3 mb-1 px-3 py-2 bg-slate-900 border-l-4 border-cyan-400 rounded-r-xl text-xs font-bold text-cyan-300 flex items-center justify-between';
                     row.innerHTML = `
                         <span onclick="editTitle(${activeSubIdx}, ${itemIdx})" class="cursor-pointer truncate">${it.title}</span>
-                        <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-600 hover:text-rose-400 text-xs ml-2">
+                        <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-600 hover:text-rose-400 text-xs ml-2 p-1">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     `;
                 } else {
-                    row.className = 'ml-3 bg-slate-900/50 hover:bg-slate-900 border border-slate-800/60 p-2 rounded-xl text-xs flex items-center justify-between transition';
+                    row.className = 'ml-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl text-xs flex items-center justify-between transition gap-2';
                     row.innerHTML = `
-                        <span onclick="editTitle(${activeSubIdx}, ${itemIdx})" class="text-slate-300 truncate flex-1 mr-2 cursor-pointer hover:text-cyan-400">
+                        <span onclick="editTitle(${activeSubIdx}, ${itemIdx})" class="text-slate-200 font-medium truncate flex-1 cursor-pointer hover:text-cyan-400">
                             ${it.title}
                         </span>
                         
-                        <div class="flex items-center gap-1.5">
+                        <!-- LARGER EASY-TO-TAP BUTTONS -->
+                        <div class="flex items-center gap-2 shrink-0">
                             <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'n')" 
-                                class="px-2 py-0.5 rounded-lg border text-[10px] font-black transition ${
-                                    it.n ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-slate-950 text-slate-600 border-slate-800'
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.n ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-sm shadow-emerald-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
                                 }">N</button>
                                 
                             <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'm')" 
-                                class="px-2 py-0.5 rounded-lg border text-[10px] font-black transition ${
-                                    it.m ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-slate-950 text-slate-600 border-slate-800'
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.m ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-sm shadow-amber-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
                                 }">M</button>
                                 
                             <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'f')" 
-                                class="px-2 py-0.5 rounded-lg border text-[10px] font-black transition ${
-                                    it.f ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' : 'bg-slate-950 text-slate-600 border-slate-800'
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.f ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50 shadow-sm shadow-indigo-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
                                 }">F</button>
 
-                            <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-700 hover:text-rose-400 text-xs ml-1">
+                            <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-700 hover:text-rose-400 text-xs ml-0.5 p-1">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
