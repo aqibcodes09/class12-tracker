@@ -1,123 +1,533 @@
-function exportData() {
-    const m = calculateMetrics();
-    const canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = 520; // Height thodi badha di hai summary ke liye
-    const ctx = canvas.getContext('2d');
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Class XII Tracker - Sync & Fast</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased pb-16 select-none">
 
-    // Background Gradient
-    const grad = ctx.createLinearGradient(0, 0, 600, 520);
-    grad.addColorStop(0, '#0f172a');
-    grad.addColorStop(1, '#020617');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 600, 520);
+    <!-- Compact Navbar -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 bg-gradient-to-tr from-cyan-500 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-cyan-500/20">
+                    <i class="fa-solid fa-check text-sm font-bold"></i>
+                </div>
+                <h1 class="text-base font-extrabold bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent tracking-tight">
+                    CLASS XII TRACKER
+                </h1>
+            </div>
+            
+            <div class="flex items-center gap-1.5">
+                <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition flex items-center gap-1" title="Export Image Progress">
+                    <i class="fa-solid fa-image"></i> <span class="hidden sm:inline">Export Image</span>
+                </button>
+                <button onclick="exportCode()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 transition flex items-center gap-1" title="Copy Data Code">
+                    <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Copy Code</span>
+                </button>
+                <button onclick="importData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/20 transition flex items-center gap-1" title="Import Progress">
+                    <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Import</span>
+                </button>
+                <button onclick="resetData()" class="p-1.5 text-xs font-semibold text-rose-400 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition" title="Reset Syllabus">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-    // Inner Card Border
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(20, 20, 560, 480);
+    <main class="max-w-4xl mx-auto px-3 sm:px-6 py-4 space-y-4">
 
-    // Title Header
-    ctx.fillStyle = '#06b6d4';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.fillText('CLASS XII STUDY TRACKER', 45, 55);
+        <!-- MINIMAL STUDENT PROFILE SECTION -->
+        <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 flex items-center justify-between shadow-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-400 text-lg shadow-inner">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-100 leading-tight">Maaz Ahmed</h2>
+                    <p class="text-[11px] text-slate-400 font-medium">Class 12th Student</p>
+                </div>
+            </div>
+            <div class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 text-[11px] font-bold tracking-wide uppercase">
+                Active
+            </div>
+        </section>
 
-    // Student Name & Info
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText('Maaz Ahmed', 45, 90);
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '14px sans-serif';
-    ctx.fillText('Class 12th Student', 45, 112);
+        <!-- DASHBOARD OVERVIEW -->
+        <section class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-cyan-400 text-sm"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Overall Progress</span>
+                </div>
+                <div id="stat-overall" class="text-xl font-black text-cyan-400">0%</div>
+            </div>
 
-    // Overall Progress Big Stat
-    ctx.fillStyle = '#06b6d4';
-    ctx.font = 'bold 50px sans-serif';
-    ctx.fillText(`${m.overallPct}%`, 450, 95);
-    ctx.fillStyle = '#64748b';
-    ctx.font = 'bold 11px sans-serif';
-    ctx.fillText('COMPLETED', 450, 115);
+            <!-- Stats Bar -->
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-3">
+                <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+            </div>
 
-    // Progress Bar Graphic
-    ctx.fillStyle = '#1e293b';
-    ctx.beginPath();
-    ctx.roundRect(45, 135, 510, 12, 6);
-    ctx.fill();
+            <!-- Counter Grid -->
+            <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Notes</span>
+                    <span id="stat-notes" class="font-black text-emerald-400 text-sm block">0</span>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase">MCQs</span>
+                    <span id="stat-mcqs" class="font-black text-amber-400 text-sm block">0</span>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Revision</span>
+                    <span id="stat-rev" class="font-black text-indigo-400 text-sm block">0</span>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded-xl border border-slate-800/80">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Total</span>
+                    <span id="stat-total" class="font-black text-purple-400 text-sm block">0</span>
+                </div>
+            </div>
+        </section>
 
-    ctx.fillStyle = '#06b6d4';
-    ctx.beginPath();
-    ctx.roundRect(45, 135, Math.max((510 * m.overallPct) / 100, 12), 12, 6);
-    ctx.fill();
+        <!-- SUBJECT TABS -->
+        <div id="subject-tabs" class="flex gap-2 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+            <!-- Dynamic Tabs -->
+        </div>
 
-    // Stats Box Grid
-    const drawBox = (x, title, val, color) => {
-        ctx.fillStyle = '#0f172a';
-        ctx.strokeStyle = '#334155';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(x, 165, 115, 80, 12);
-        ctx.fill();
-        ctx.stroke();
+        <!-- ACTIVE SYLLABUS LIST -->
+        <section id="active-subject-container" class="space-y-2">
+            <!-- Dynamic Active Subject Content -->
+        </section>
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.fillText(title.toUpperCase(), x + 15, 190);
+    </main>
 
-        ctx.fillStyle = color;
-        ctx.font = 'bold 24px sans-serif';
-        ctx.fillText(val, x + 15, 225);
-    };
-
-    drawBox(45, 'Notes', m.totalN, '#34d399');
-    drawBox(175, 'MCQs', m.totalM, '#fbbf24');
-    drawBox(305, 'Revision', m.totalF, '#818cf8');
-    drawBox(435, 'Total Items', m.totalItems, '#c084fc');
-
-    // Completed Breakdown Summary Box
-    ctx.fillStyle = '#0f172a';
-    ctx.strokeStyle = '#1e293b';
-    ctx.beginPath();
-    ctx.roundRect(45, 265, 510, 180, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.fillText('COMPLETED SYLLABUS HIGHLIGHTS', 65, 295);
-
-    let startY = 325;
-    let completedFound = false;
-
-    // Show completed items
-    syllabus.forEach(sub => {
-        const doneItems = sub.items.filter(i => !i.isHeader && (i.n || i.m || i.f));
-        if (doneItems.length > 0 && startY <= 410) {
-            completedFound = true;
-            ctx.fillStyle = '#f1f5f9';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.fillText(`✓ ${sub.name}:`, 65, startY);
-
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '12px sans-serif';
-            ctx.fillText(`${doneItems.length} topics worked on`, 200, startY);
-            startY += 25;
+    <script>
+        function createPhysicsChapter(chNum) {
+            return [
+                { title: `Chapter ${chNum}`, isHeader: true, n: false, m: false, f: false },
+                { title: 'Short Questions', isSub: true, n: false, m: false, f: false },
+                { title: 'Long Questions', isSub: true, n: false, m: false, f: false },
+                { title: 'Derivations', isSub: true, n: false, m: false, f: false },
+                { title: 'Numericals', isSub: true, n: false, m: false, f: false },
+                { title: 'MCQs', isSub: true, n: false, m: false, f: false }
+            ];
         }
-    });
 
-    if (!completedFound) {
-        ctx.fillStyle = '#64748b';
-        ctx.font = '12px sans-serif';
-        ctx.fillText('No topics completed yet. Start ticking your syllabus!', 65, 330);
-    }
+        function createChemChapter(chNum) {
+            return [
+                { title: `Chapter ${chNum}`, isHeader: true, n: false, m: false, f: false },
+                { title: 'Short Questions', isSub: true, n: false, m: false, f: false },
+                { title: 'Long Questions', isSub: true, n: false, m: false, f: false },
+                { title: 'MCQs', isSub: true, n: false, m: false, f: false }
+            ];
+        }
 
-    // Footer
-    ctx.fillStyle = '#475569';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('Generated via Class XII Tracker Portal', 45, 480);
+        function createMathUnit(unitTitle, exercises) {
+            let list = [{ title: unitTitle, isHeader: true, n: false, m: false, f: false }];
+            exercises.forEach(ex => {
+                list.push({ title: ex, isSub: true, n: false, m: false, f: false });
+            });
+            list.push({ title: 'Short Examples', isSub: true, n: false, m: false, f: false });
+            list.push({ title: 'MCQs', isSub: true, n: false, m: false, f: false });
+            return list;
+        }
 
-    // Download Link
-    const link = document.createElement('a');
-    link.download = `Maaz_Ahmed_Class12_Progress.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-}
+        function createGenChapter(title) {
+            return [
+                { title: title, isHeader: true, n: false, m: false, f: false },
+                { title: 'Short / Long Questions', isSub: true, n: false, m: false, f: false },
+                { title: 'MCQs', isSub: true, n: false, m: false, f: false }
+            ];
+        }
+
+        const defaultSyllabus = [
+            { id: 'sub_physics', name: 'PHYSICS', items: [
+                ...createPhysicsChapter(15), ...createPhysicsChapter(16), ...createPhysicsChapter(17),
+                ...createPhysicsChapter(18), ...createPhysicsChapter(19), ...createPhysicsChapter(20),
+                ...createPhysicsChapter(21), ...createPhysicsChapter(22), ...createPhysicsChapter(23),
+                ...createPhysicsChapter(24), ...createPhysicsChapter(25), ...createPhysicsChapter(26),
+                ...createPhysicsChapter(27), ...createPhysicsChapter(28)
+            ]},
+            { id: 'sub_chemistry', name: 'CHEMISTRY', items: [
+                ...createChemChapter(1), ...createChemChapter(2), ...createChemChapter(3),
+                ...createChemChapter(4), ...createChemChapter(5), ...createChemChapter(6),
+                ...createChemChapter(7), ...createChemChapter(8), ...createChemChapter(9),
+                ...createChemChapter(10), ...createChemChapter(11), ...createChemChapter(12),
+                ...createChemChapter(13)
+            ]},
+            { id: 'sub_maths', name: 'MATHEMATICS', items: [
+                ...createMathUnit('Unit # 1', []),
+                ...createMathUnit('Unit # 2', ['Ex 2.1', 'Ex 2.2', 'Ex 2.3', 'Ex 2.4', 'Review Ex']),
+                ...createMathUnit('Unit # 3', ['Ex 3.1', 'Ex 3.2', 'Ex 3.3', 'Ex 3.4', 'Ex 3.5', 'Ex 3.6', 'Review Ex']),
+                ...createMathUnit('Unit # 4', ['Ex 4.1', 'Ex 4.2', 'Ex 4.3', 'Ex 4.4', 'Review Ex']),
+                ...createMathUnit('Unit # 5', ['Ex 5.1', 'Ex 5.2', 'Review Ex']),
+                ...createMathUnit('Unit # 6', ['Ex 6.1', 'Ex 6.2', 'Ex 6.3', 'Ex 6.4', 'Ex 6.5', 'Ex 6.6', 'Ex 6.7', 'Review Ex']),
+                ...createMathUnit('Unit # 7', ['Ex 7.1', 'Ex 7.2', 'Ex 7.3', 'Ex 7.4', 'Ex 7.5', 'Ex 7.6', 'Ex 7.7', 'Ex 7.8', 'Review Ex']),
+                ...createMathUnit('Unit # 8', ['Ex 8.1', 'Ex 8.2', 'Ex 8.3', 'Ex 8.4', 'Review Ex']),
+                ...createMathUnit('Unit # 9', ['Ex 9.1', 'Ex 9.2', 'Ex 9.3', 'Ex 9.4', 'Ex 9.5', 'Ex 9.6', 'Review Ex']),
+                ...createMathUnit('Unit # 10', ['Ex 10.1', 'Ex 10.2', 'Ex 10.3', 'Review Ex']),
+                ...createMathUnit('Unit # 11', []),
+                ...createMathUnit('Unit # 12', ['Ex 12.1', 'Ex 12.2', 'Ex 12.3', 'Ex 12.4', 'Review Ex'])
+            ]},
+            { id: 'sub_english', name: 'ENGLISH', items: [
+                ...createGenChapter('Prose: 1.1 Devoted Friend'),
+                ...createGenChapter('Prose: 2.1 I Have a Dream'),
+                ...createGenChapter('Prose: 3.1 Stress/Anger'),
+                ...createGenChapter('Prose: 4.1 Self-Discipline'),
+                ...createGenChapter('Prose: 5.1 Character Build'),
+                ...createGenChapter('Prose: 6.1 Civic Respons.'),
+                ...createGenChapter('Prose: 7.1 Climate Change'),
+                ...createGenChapter('Poetry: 01. If'),
+                ...createGenChapter('Poetry: 02. Age of Infancy'),
+                ...createGenChapter('Poetry: 03. 7 Ages of Man'),
+                ...createGenChapter('Poetry: 04. Dying Slowly'),
+                ...createGenChapter('Poetry: 05. Ulysses'),
+                ...createGenChapter('Poetry: 06. Stop Clocks'),
+                ...createGenChapter('Poetry: 07. Sur Sasui'),
+                ...createGenChapter('Novel: Great Expectations')
+            ]},
+            { id: 'sub_pakstudies', name: 'PAK STUDIES', items: [
+                ...createGenChapter('Chapter 1'), ...createGenChapter('Chapter 2'), ...createGenChapter('Chapter 3'),
+                ...createGenChapter('Chapter 4'), ...createGenChapter('Chapter 5'), ...createGenChapter('Chapter 6'),
+                ...createGenChapter('Chapter 7'), ...createGenChapter('Chapter 8'), ...createGenChapter('Chapter 9'),
+                ...createGenChapter('Chapter 10')
+            ]},
+            { id: 'sub_urdu', name: 'URDU', items: [
+                ...createGenChapter('Nasr: 1. Seerat-e-Muhammadi'),
+                ...createGenChapter('Nasr: 2. Aalamgir Kifayat'),
+                ...createGenChapter('Nasr: 3. Khush Tabi'),
+                ...createGenChapter('Nasr: 4. Qaht-er-Rijal'),
+                ...createGenChapter('Nasr: 5. Musha\'irah'),
+                ...createGenChapter('Nasr: 6. Adab Aamozon'),
+                ...createGenChapter('Nasr: 7. Lahore Mein Adeebon ki Colony'),
+                ...createGenChapter('Nasr: 8. Meradim'),
+                ...createGenChapter('Nasr: 9. Sahar Hone Tak'),
+                ...createGenChapter('Nasr: 10. Zameen'),
+                ...createGenChapter('Nasr: 11. Naye Daur Ki Larai'),
+                ...createGenChapter('Nasr: 12. Char Maal Dar'),
+                ...createGenChapter('Nasr: 13. Hasrat Mohani'),
+                ...createGenChapter('Nasr: 14. Sir Iqbal Marhoom'),
+                ...createGenChapter('Nasr: 15. Chutne Ke Ta Qayamat'),
+                ...createGenChapter('Nasr: 16. Sowere Jo Kal Aankh Meri Khuli'),
+                ...createGenChapter('Nasr: 17. Cricket'),
+                ...createGenChapter('Nazm: 1. Hamd'),
+                ...createGenChapter('Nazm: 2. Naat'),
+                ...createGenChapter('Nazm: 3. Manqabat'),
+                ...createGenChapter('Nazm: 4. Hazrat Fatima Zahra ki Rukshti'),
+                ...createGenChapter('Nazm: 5. Chand Aur Tare'),
+                ...createGenChapter('Nazm: 6. Badli Ka Chand'),
+                ...createGenChapter('Nazm: 7. Katba Kaun Likhe Ga'),
+                ...createGenChapter('Nazm: 8. Marham'),
+                ...createGenChapter('Nazm: 9. Do Bahre Shanasaiyon...'),
+                ...createGenChapter('Nazm: 10. Geet'),
+                ...createGenChapter('Nazm: 11. Asloob'),
+                ...createGenChapter('Nazm: 12. Aab-e-Zamzam'),
+                ...createGenChapter('Nazm: 13. Kaam'),
+                ...createGenChapter('Ghazal: 14. Khawaja Mir Dard'),
+                ...createGenChapter('Ghazal: 15. Mir Taqi Mir'),
+                ...createGenChapter('Ghazal: 16. Mirza Ghalib'),
+                ...createGenChapter('Ghazal: 17. Momin Khan Momin'),
+                ...createGenChapter('Ghazal: 18. Firaq Gorakhpuri'),
+                ...createGenChapter('Ghazal: 19. Jigar Moradabadi'),
+                ...createGenChapter('Ghazal: 20. Nasir Kazmi'),
+                ...createGenChapter('Ghazal: 21. Jaun Elia'),
+                ...createGenChapter('Ghazal: 22. Fatima Hasan'),
+                ...createGenChapter('Ghazal: 23. Khushal Khan')
+            ]}
+        ];
+
+        let syllabus = JSON.parse(localStorage.getItem('class12_touch_v1')) || defaultSyllabus;
+        let activeSubIdx = 0;
+
+        function saveAndRender() {
+            localStorage.setItem('class12_touch_v1', JSON.stringify(syllabus));
+            renderUI();
+        }
+
+        function exportData() {
+            const m = calculateMetrics();
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 520;
+            const ctx = canvas.getContext('2d');
+
+            const grad = ctx.createLinearGradient(0, 0, 600, 520);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(1, '#020617');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 600, 520);
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, 20, 560, 480);
+
+            ctx.fillStyle = '#06b6d4';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('CLASS XII STUDY TRACKER', 45, 55);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText('Maaz Ahmed', 45, 90);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('Class 12th Student', 45, 112);
+
+            ctx.fillStyle = '#06b6d4';
+            ctx.font = 'bold 50px sans-serif';
+            ctx.fillText(`${m.overallPct}%`, 450, 95);
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText('COMPLETED', 450, 115);
+
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(45, 135, 510, 12, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#06b6d4';
+            ctx.beginPath();
+            ctx.roundRect(45, 135, Math.max((510 * m.overallPct) / 100, 12), 12, 6);
+            ctx.fill();
+
+            const drawBox = (x, title, val, color) => {
+                ctx.fillStyle = '#0f172a';
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(x, 165, 115, 80, 12);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.fillText(title.toUpperCase(), x + 15, 190);
+
+                ctx.fillStyle = color;
+                ctx.font = 'bold 24px sans-serif';
+                ctx.fillText(val, x + 15, 225);
+            };
+
+            drawBox(45, 'Notes', m.totalN, '#34d399');
+            drawBox(175, 'MCQs', m.totalM, '#fbbf24');
+            drawBox(305, 'Revision', m.totalF, '#818cf8');
+            drawBox(435, 'Total Items', m.totalItems, '#c084fc');
+
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(45, 265, 510, 180, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText('COMPLETED SYLLABUS HIGHLIGHTS', 65, 295);
+
+            let startY = 325;
+            let completedFound = false;
+
+            syllabus.forEach(sub => {
+                const doneItems = sub.items.filter(i => !i.isHeader && (i.n || i.m || i.f));
+                if (doneItems.length > 0 && startY <= 410) {
+                    completedFound = true;
+                    ctx.fillStyle = '#f1f5f9';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.fillText(`✓ ${sub.name}:`, 65, startY);
+
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText(`${doneItems.length} topics worked on`, 200, startY);
+                    startY += 25;
+                }
+            });
+
+            if (!completedFound) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px sans-serif';
+                ctx.fillText('No topics completed yet. Start ticking your syllabus!', 65, 330);
+            }
+
+            ctx.fillStyle = '#475569';
+            ctx.font = '11px sans-serif';
+            ctx.fillText('Generated via Class XII Tracker Portal', 45, 480);
+
+            const link = document.createElement('a');
+            link.download = `Maaz_Ahmed_Class12_Progress.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function exportCode() {
+            const dataStr = btoa(JSON.stringify(syllabus));
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert("Aapka progress code copy ho gaya hai! Is code ko Import button me paste kar sakte hain.");
+            }).catch(() => {
+                prompt("Aapka progress code yahan hai, isse copy karein:", dataStr);
+            });
+        }
+
+        function importData() {
+            const inputData = prompt("Copy kiya hua code yahan paste karein:");
+            if (inputData && inputData.trim() !== "") {
+                try {
+                    const parsed = JSON.parse(atob(inputData.trim()));
+                    if (Array.isArray(parsed)) {
+                        syllabus = parsed;
+                        saveAndRender();
+                        alert("Progress successfully sync ho gaya!");
+                    } else {
+                        alert("Invalid code format!");
+                    }
+                } catch(e) {
+                    alert("Code sahi nahi hai. Phir se copy karein.");
+                }
+            }
+        }
+
+        function resetData() {
+            if (confirm("Kya aap saara progress reset karna chahte hain?")) {
+                localStorage.removeItem('class12_touch_v1');
+                syllabus = defaultSyllabus;
+                activeSubIdx = 0;
+                saveAndRender();
+            }
+        }
+
+        function toggleCheck(subIdx, itemIdx, type) {
+            syllabus[subIdx].items[itemIdx][type] = !syllabus[subIdx].items[itemIdx][type];
+            saveAndRender();
+        }
+
+        function editTitle(subIdx, itemIdx) {
+            const cur = syllabus[subIdx].items[itemIdx].title;
+            const updated = prompt("Edit Title:", cur);
+            if (updated && updated.trim() !== "") {
+                syllabus[subIdx].items[itemIdx].title = updated.trim();
+                saveAndRender();
+            }
+        }
+
+        function addItem(subIdx) {
+            const title = prompt("Enter New Sub-Section / Chapter:");
+            if (title && title.trim() !== "") {
+                syllabus[subIdx].items.push({ title: title.trim(), isSub: true, n: false, m: false, f: false });
+                saveAndRender();
+            }
+        }
+
+        function deleteItem(subIdx, itemIdx) {
+            if (confirm("Delete this item?")) {
+                syllabus[subIdx].items.splice(itemIdx, 1);
+                saveAndRender();
+            }
+        }
+
+        function calculateMetrics() {
+            let totalItems = 0, totalN = 0, totalM = 0, totalF = 0;
+            syllabus.forEach(sub => {
+                sub.items.forEach(it => {
+                    totalItems++;
+                    if (it.n) totalN++;
+                    if (it.m) totalM++;
+                    if (it.f) totalF++;
+                });
+            });
+            const overallPct = (totalItems * 3) > 0 ? Math.round(((totalN + totalM + totalF) / (totalItems * 3)) * 100) : 0;
+            return { totalItems, totalN, totalM, totalF, overallPct };
+        }
+
+        function renderUI() {
+            const m = calculateMetrics();
+            document.getElementById('stat-overall').innerText = `${m.overallPct}%`;
+            document.getElementById('progress-bar').style.width = `${m.overallPct}%`;
+            document.getElementById('stat-notes').innerText = `${m.totalN}`;
+            document.getElementById('stat-mcqs').innerText = `${m.totalM}`;
+            document.getElementById('stat-rev').innerText = `${m.totalF}`;
+            document.getElementById('stat-total').innerText = `${m.totalItems}`;
+
+            const tabsContainer = document.getElementById('subject-tabs');
+            tabsContainer.innerHTML = '';
+            syllabus.forEach((sub, idx) => {
+                const isActive = idx === activeSubIdx;
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 rounded-xl transition whitespace-nowrap border text-xs ${
+                    isActive 
+                    ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-300 font-bold shadow-md shadow-cyan-500/10' 
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`;
+                btn.innerText = sub.name;
+                btn.onclick = () => { activeSubIdx = idx; renderUI(); };
+                tabsContainer.appendChild(btn);
+            });
+
+            const container = document.getElementById('active-subject-container');
+            container.innerHTML = '';
+
+            const activeSub = syllabus[activeSubIdx];
+            if (!activeSub) return;
+
+            const topBar = document.createElement('div');
+            topBar.className = 'flex items-center justify-between bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs';
+            topBar.innerHTML = `
+                <span class="font-bold text-cyan-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-bookmark"></i> ${activeSub.name}
+                </span>
+                <button onclick="addItem(${activeSubIdx})" class="text-xs font-semibold text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg transition">
+                    + Add Item
+                </button>
+            `;
+            container.appendChild(topBar);
+
+            activeSub.items.forEach((it, itemIdx) => {
+                const row = document.createElement('div');
+                
+                if (it.isHeader) {
+                    row.className = 'mt-3 mb-1 px-3 py-2 bg-slate-900 border-l-4 border-cyan-400 rounded-r-xl text-xs font-bold text-cyan-300 flex items-center justify-between';
+                    row.innerHTML = `
+                        <span onclick="editTitle(${activeSubIdx}, ${itemIdx})" class="cursor-pointer truncate">${it.title}</span>
+                        <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-600 hover:text-rose-400 text-xs ml-2 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    `;
+                } else {
+                    row.className = 'ml-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl text-xs flex items-center justify-between transition gap-2';
+                    row.innerHTML = `
+                        <span onclick="editTitle(${activeSubIdx}, ${itemIdx})" class="text-slate-200 font-medium truncate flex-1 cursor-pointer hover:text-cyan-400">
+                            ${it.title}
+                        </span>
+                        
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'n')" 
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.n ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-sm shadow-emerald-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
+                                }">N</button>
+                                
+                            <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'm')" 
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.m ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 shadow-sm shadow-amber-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
+                                }">M</button>
+                                
+                            <button onclick="toggleCheck(${activeSubIdx}, ${itemIdx}, 'f')" 
+                                class="w-9 h-8 rounded-lg border text-xs font-extrabold flex items-center justify-center transition active:scale-95 ${
+                                    it.f ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50 shadow-sm shadow-indigo-500/20' : 'bg-slate-950 text-slate-500 border-slate-800'
+                                }">F</button>
+
+                            <button onclick="deleteItem(${activeSubIdx}, ${itemIdx})" class="text-slate-700 hover:text-rose-400 text-xs ml-0.5 p-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                container.appendChild(row);
+            });
+        }
+
+        renderUI();
+    </script>
+</body>
+</html>
