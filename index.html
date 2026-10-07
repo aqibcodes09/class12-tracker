@@ -24,8 +24,11 @@
             </div>
             
             <div class="flex items-center gap-1.5">
-                <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition flex items-center gap-1" title="Export Progress">
-                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Export</span>
+                <button onclick="exportData()" class="px-2.5 py-1.5 text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-lg hover:bg-cyan-500/20 transition flex items-center gap-1" title="Export Image Progress">
+                    <i class="fa-solid fa-image"></i> <span class="hidden sm:inline">Export Image</span>
+                </button>
+                <button onclick="exportCode()" class="px-2.5 py-1.5 text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-700 transition flex items-center gap-1" title="Copy Data Code">
+                    <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Copy Code</span>
                 </button>
                 <button onclick="importData()" class="px-2.5 py-1.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/20 transition flex items-center gap-1" title="Import Progress">
                     <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Import</span>
@@ -247,6 +250,93 @@
         }
 
         function exportData() {
+            const m = calculateMetrics();
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+
+            // Background Gradient
+            const grad = ctx.createLinearGradient(0, 0, 600, 400);
+            grad.addColorStop(0, '#0f172a');
+            grad.addColorStop(1, '#020617');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 600, 400);
+
+            // Inner Card Border
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(20, 20, 560, 360);
+
+            // Title Header
+            ctx.fillStyle = '#06b6d4';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('CLASS XII STUDY TRACKER', 45, 60);
+
+            // Student Name & Info
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText('Maaz Ahmed', 45, 95);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('Class 12th Student', 45, 118);
+
+            // Overall Progress Circle / Big Stat
+            ctx.fillStyle = '#06b6d4';
+            ctx.font = 'bold 54px sans-serif';
+            ctx.fillText(`${m.overallPct}%`, 450, 100);
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('COMPLETED', 450, 120);
+
+            // Progress Bar Graphic
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(45, 145, 510, 12, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#06b6d4';
+            ctx.beginPath();
+            ctx.roundRect(45, 145, Math.max((510 * m.overallPct) / 100, 12), 12, 6);
+            ctx.fill();
+
+            // Stats Box Grid
+            const drawBox = (x, title, val, color) => {
+                ctx.fillStyle = '#0f172a';
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(x, 180, 115, 90, 12);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(title.toUpperCase(), x + 15, 210);
+
+                ctx.fillStyle = color;
+                ctx.font = 'bold 26px sans-serif';
+                ctx.fillText(val, x + 15, 248);
+            };
+
+            drawBox(45, 'Notes', m.totalN, '#34d399');
+            drawBox(175, 'MCQs', m.totalM, '#fbbf24');
+            drawBox(305, 'Revision', m.totalF, '#818cf8');
+            drawBox(435, 'Total Items', m.totalItems, '#c084fc');
+
+            // Footer
+            ctx.fillStyle = '#475569';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Generated via Class XII Tracker Portal', 45, 335);
+
+            // Download Link
+            const link = document.createElement('a');
+            link.download = `Maaz_Ahmed_Class12_Progress.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function exportCode() {
             const dataStr = btoa(JSON.stringify(syllabus));
             navigator.clipboard.writeText(dataStr).then(() => {
                 alert("Aapka progress code copy ho gaya hai! Is code ko mobile par Import button me paste kar dein.");
